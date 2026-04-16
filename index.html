@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REDRMY | Elite Tactical Electronics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --blood-red: #8B0000;
+            --crimson: #DC143C;
+            --dark-red: #4A0000;
+            --black: #050505;
+            --matte-black: #0a0a0a;
+            --steel: #1a1a1a;
+        }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--black);
+            color: #ffffff;
+            overflow-x: hidden;
+            cursor: auto;
+        }
+        
+        .font-display {
+            font-family: 'Chakra Petch', sans-serif;
+        }
+        
+        /* Background */
+        .bg-void {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: 
+                radial-gradient(ellipse at 20% 80%, rgba(139, 0, 0, 0.4) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(220, 20, 60, 0.2) 0%, transparent 40%),
+                #050505;
+        }
+        
+        .texture-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+            z-index: -1;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(139, 0, 0, 0.1) 35px, rgba(139, 0, 0, 0.1) 70px);
+            pointer-events: none;
+        }
+        
+        /* Cursor */
+        .cursor-main {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #DC143C;
+            background: rgba(139, 0, 0, 0.3);
+            transform: translate(-50%, -50%) rotate(45deg);
+            z-index: 99999;
+            pointer-events: none;
+            box-shadow: 0 0 15px rgba(220, 20, 60, 0.8);
+        }
+        
+        .cursor-center {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 99999;
+            pointer-events: none;
+        }
+        
+        /* Tech Trail */
+        .tech-trail {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.9;
+        }
+        
+        .tech-icon {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: #DC143C;
+            stroke-width: 1.5;
+        }
+        
+        /* Cards - Mobile Optimized */
+        .brutal-card {
+            background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 100%);
+            border: 1px solid #2a2a2a;
+            border-left: 3px solid #8B0000;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .brutal-card:hover {
+            border-left-color: #DC143C;
+            transform: translateX(5px);
+        }
+        
+        /* Mobile card compact */
+        @media (max-width: 640px) {
+            .brutal-card {
+                border-left-width: 2px;
+            }
+            .brutal-card:hover {
+                transform: translateX(3px);
+            }
+        }
+        
+        /* Button */
+        .btn-brutal {
+            background: #8B0000;
+            border: none;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+        
+        .btn-brutal:hover {
+            background: #DC143C;
+        }
+        
+        @media (max-width: 640px) {
+            .btn-brutal {
+                font-size: 0.65rem;
+                padding: 0.5rem 0.75rem;
+                letter-spacing: 0.5px;
+            }
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #8B0000;
+            color: #8B0000;
+        }
+        
+        .btn-outline:hover {
+            background: #8B0000;
+            color: white;
+        }
+        
+        /* Glitch */
+        .glitch {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .glitch::before {
+            left: 1px;
+            text-shadow: -1px 0 #8B0000;
+            clip: rect(24px, 450px, 24px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        
+        .glitch::after {
+            left: -1px;
+            text-shadow: -1px 0 #DC143C;
+            clip: rect(24px, 450px, 24px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+        
+        @keyframes glitch-anim {
+            0% { clip: rect(12px, 9999px, 52px, 0); }
+            20% { clip: rect(65px, 9999px, 11px, 0); }
+            40% { clip: rect(26px, 9999px, 89px, 0); }
+            60% { clip: rect(82px, 9999px, 33px, 0); }
+            80% { clip: rect(44px, 9999px, 12px, 0); }
+            100% { clip: rect(53px, 9999px, 66px, 0); }
+        }
+        
+        @keyframes glitch-anim2 {
+            0% { clip: rect(65px, 9999px, 99px, 0); }
+            20% { clip: rect(12px, 9999px, 43px, 0); }
+            40% { clip: rect(78px, 9999px, 12px, 0); }
+            60% { clip: rect(34px, 9999px, 67px, 0); }
+            80% { clip: rect(89px, 9999px, 23px, 0); }
+            100% { clip: rect(12px, 9999px, 54px, 0); }
+        }
+        
+        /* Nav */
+        .nav-brutal {
+            background: rgba(5, 5, 5, 0.98);
+            border-bottom: 1px solid #8B0000;
+        }
+        
+        /* Kill Tab */
+        .kill-tab {
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            border-left: 2px solid transparent;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            letter-spacing: 0.5px;
+        }
+        
+        @media (min-width: 768px) {
+            .kill-tab {
+                font-size: 0.75rem;
+                letter-spacing: 1px;
+            }
+        }
+        
+        .kill-tab:hover,
+        .kill-tab.active {
+            background: #1a1a1a;
+            border-left-color: #DC143C;
+        }
+        
+        /* Price */
+        .price-tag {
+            background: #8B0000;
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            font-size: 0.65rem;
+        }
+        
+        @media (min-width: 768px) {
+            .price-tag {
+                font-size: 0.75rem;
+            }
+        }
+        
+        /* Footer - Compact */
+        .footer-compact {
+            background: #050505;
+            border-top: 1px solid #8B0000;
+        }
+        
+        /* Cart */
+        .cart-sidebar-brutal {
+            background: #050505;
+            border-left: 2px solid #8B0000;
+        }
+        
+        /* Toast */
+        .toast-brutal {
+            background: #0a0a0a;
+            border: 1px solid #8B0000;
+            border-left: 3px solid #DC143C;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #8B0000;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 640px) {
+            .stat-box {
+                min-width: 80px;
+                padding: 0.5rem;
+            }
+            .stat-box .text-3xl {
+                font-size: 1.25rem;
+            }
+        }
+        
+        @media (pointer: coarse) {
+            .cursor-main,
+            .cursor-center {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-void"></div>
+    <div class="texture-overlay"></div>
+    
+    <div class="cursor-main" id="cursor-main"></div>
+    <div class="cursor-center" id="cursor-center"></div>
+    <div id="trail-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9998;"></div>
+    
+    <!-- Nav -->
+    <nav class="fixed top-0 left-0 right-0 z-50 nav-brutal">
+        <div class="max-w-7xl mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <div class="w-8 h-8 bg-gradient-to-br from-red-900 to-red-600 flex items-center justify-center" style="clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);">
+                        <span class="text-white font-display font-bold">R</span>
+                    </div>
+                    <div>
+                        <span class="text-lg font-display font-bold tracking-widest glitch" data-text="REDRMY">REDRMY</span>
+                        <div class="text-[8px] text-red-600 tracking-widest uppercase">Tactical</div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <button class="relative p-2 hover:bg-red-900/20 transition-colors" onclick="toggleCart()">
+                        <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                        </svg>
+                        <span id="cart-count" class="absolute -top-1 -right-1 w-4 h-4 bg-red-700 text-[10px] flex items-center justify-center font-bold hidden" style="clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);">0</span>
+                    </button>
+                    
+                    <button class="md:hidden p-2" onclick="toggleMobileMenu()">
+                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Mobile Menu -->
+    <div class="fixed inset-y-0 right-0 w-64 bg-black border-l-2 border-red-900 z-40 transform translate-x-full transition-transform duration-300 flex flex-col pt-20 px-6 gap-4" id="mobile-menu">
+        <button class="absolute top-4 right-4" onclick="toggleMobileMenu()">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+        <a href="#arsenal" class="text-lg font-bold text-gray-300 hover:text-red-500 uppercase tracking-wider" onclick="toggleMobileMenu()">Arsenal</a>
+        <a href="#intel" class="text-lg font-bold text-gray-300 hover:text-red-500 uppercase tracking-wider" onclick="toggleMobileMenu()">Intel</a>
+    </div>
+    
+    <!-- Hero -->
+    <section class="min-h-[80vh] flex items-center pt-16 px-4">
+        <div class="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-8 items-center">
+            <div class="space-y-6">
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-red-900/10 border border-red-900/30 text-red-500 text-xs uppercase tracking-widest font-bold">
+                    <span class="w-1.5 h-1.5 bg-red-600 animate-pulse rounded-full"></span>
+                    Clearance: Alpha
+                </div>
+                
+                <h1 class="text-4xl md:text-6xl font-display font-bold leading-none tracking-tighter">
+                    THE <span class="text-red-700 glitch" data-text="RED">RED</span> ARMY
+                </h1>
+                
+                <p class="text-sm text-gray-400 max-w-md leading-relaxed border-l-2 border-red-900 pl-4">
+                    Elite tactical electronics for operators who demand absolute precision.
+                </p>
+                
+                <div class="flex flex-wrap gap-3">
+                    <button class="btn-brutal px-6 py-3 text-white text-sm flex items-center gap-2" onclick="scrollToArsenal()">
+                        Enter Arsenal
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-4 pt-4">
+                    <div class="stat-box p-3">
+                        <div class="text-xl font-display font-bold text-red-600">50K+</div>
+                        <div class="text-[10px] text-gray-500 uppercase">Operators</div>
+                    </div>
+                    <div class="stat-box p-3">
+                        <div class="text-xl font-display font-bold text-red-600">99%</div>
+                        <div class="text-[10px] text-gray-500 uppercase">Success</div>
+                    </div>
+                    <div class="stat-box p-3">
+                        <div class="text-xl font-display font-bold text-red-600">24H</div>
+                        <div class="text-[10px] text-gray-500 uppercase">Deploy</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="relative hidden lg:block">
+                <div class="brutal-card p-2">
+                    <div class="relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=600&auto=format&fit=crop&q=80" 
+                             alt="Tactical Headset" 
+                             class="w-full h-80 object-cover filter contrast-125 saturate-50">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="text-red-600 text-xs uppercase tracking-widest font-bold">Featured</div>
+                                    <div class="text-lg font-display font-bold">Tactical Comms X7</div>
+                                </div>
+                                <div class="price-tag px-3 py-1 text-white">$899</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Categories -->
+    <section id="intel" class="py-12 px-4 border-t border-red-900/20">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-display font-bold">Asset <span class="text-red-700">Classes</span></h2>
+            </div>
+            
+            <div class="flex flex-wrap gap-2" id="category-filters">
+                <button class="kill-tab active px-4 py-2 text-xs font-bold" data-category="all">All</button>
+                <button class="kill-tab px-4 py-2 text-xs font-bold" data-category="audio">Audio</button>
+                <button class="kill-tab px-4 py-2 text-xs font-bold" data-category="tech">Tech</button>
+                <button class="kill-tab px-4 py-2 text-xs font-bold" data-category="gaming">Gaming</button>
+                <button class="kill-tab px-4 py-2 text-xs font-bold" data-category="wearables">Wearables</button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Products - Compact Grid -->
+    <section id="arsenal" class="py-12 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-display font-bold">Field <span class="text-red-700">Equipment</span></h2>
+                <div class="relative w-40 md:w-64">
+                    <input type="text" placeholder="Search..." class="input-brutal w-full px-3 py-2 text-sm text-white placeholder-gray-600" id="search-input">
+                </div>
+            </div>
+            
+            <!-- Mobile: 2 cols, Tablet: 3, Desktop: 4 -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4" id="products-grid">
+                <!-- Products injected -->
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features - Compact -->
+    <section class="py-12 px-4 border-t border-red-900/20 bg-gradient-to-b from-transparent to-red-900/5">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-3 gap-3 md:gap-6">
+                <div class="brutal-card p-3 md:p-4 text-center">
+                    <svg class="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    <h3 class="text-xs md:text-sm font-bold uppercase tracking-wider text-red-500 mb-1">Rapid</h3>
+                    <p class="text-[10px] md:text-xs text-gray-400">24h deploy</p>
+                </div>
+                
+                <div class="brutal-card p-3 md:p-4 text-center">
+                    <svg class="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                    <h3 class="text-xs md:text-sm font-bold uppercase tracking-wider text-red-500 mb-1">Secure</h3>
+                    <p class="text-[10px] md:text-xs text-gray-400">Encrypted</p>
+                </div>
+                
+                <div class="brutal-card p-3 md:p-4 text-center">
+                    <svg class="w-6 h-6 md:w-8 md:h-8 mx-auto mb-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    <h3 class="text-xs md:text-sm font-bold uppercase tracking-wider text-red-500 mb-1">Extract</h3>
+                    <p class="text-[10px] md:text-xs text-gray-400">30d return</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Compact Footer -->
+    <footer class="footer-compact py-6 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 bg-gradient-to-br from-red-900 to-red-600 flex items-center justify-center" style="clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);">
+                        <span class="text-white font-bold text-xs">R</span>
+                    </div>
+                    <span class="text-sm font-display font-bold tracking-widest">REDRMY</span>
+                </div>
+                
+                <div class="flex gap-4 text-xs text-gray-500 uppercase tracking-wider">
+                    <a href="#" class="hover:text-red-500">Privacy</a>
+                    <a href="#" class="hover:text-red-500">Terms</a>
+                    <a href="#" class="hover:text-red-500">Contact</a>
+                </div>
+                
+                <p class="text-[10px] text-gray-600 uppercase tracking-widest">&copy; 2024 REDRMY</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Cart Sidebar -->
+    <div class="fixed inset-0 z-50 pointer-events-none" id="cart-overlay">
+        <div class="absolute inset-0 bg-black/80 opacity-0 transition-opacity duration-300" onclick="toggleCart()"></div>
+        <div class="cart-sidebar-brutal absolute right-0 top-0 h-full w-80 transform translate-x-full transition-transform duration-300 pointer-events-auto flex flex-col" id="cart-sidebar">
+            <div class="p-4 border-b border-red-900/30 flex items-center justify-between">
+                <h2 class="text-lg font-display font-bold tracking-widest">ARMORY</h2>
+                <button onclick="toggleCart()" class="p-1">
+                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-4" id="cart-items">
+                <div class="text-center text-gray-600 mt-10">
+                    <p class="text-xs uppercase tracking-widest">Armory Empty</p>
+                </div>
+            </div>
+            
+            <div class="p-4 border-t border-red-900/30">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-xs text-gray-400 uppercase">Total</span>
+                    <span id="cart-total" class="text-red-600 font-bold text-lg">$0.00</span>
+                </div>
+                <button class="w-full btn-brutal py-3 text-center text-sm font-bold" onclick="checkout()">
+                    Execute Order
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast -->
+    <div class="toast-brutal fixed bottom-4 right-4 p-3 transform translate-x-[300px] opacity-0 transition-all duration-300 z-[1000]" id="toast">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <div>
+                <div class="text-xs font-bold uppercase text-red-500">Asset Secured</div>
+                <div class="text-[10px] text-gray-400" id="toast-message">Added</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tech Icons for Trail
+        const techIcons = [
+            `<svg viewBox="0 0 24 24" class="tech-icon"><rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" fill="none"/><circle cx="7" cy="12" r="1.5" fill="currentColor"/><circle cx="17" cy="12" r="1.5" fill="currentColor"/></svg>`,
+            `<svg viewBox="0 0 24 24" class="tech-icon"><rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" fill="none"/><path d="M5 8h2M9 8h2M13 8h2M17 8h2M5 12h2M9 12h2M13 12h2M17 12h2M7 16h10" stroke="currentColor" stroke-width="1"/></svg>`,
+            `<svg viewBox="0 0 24 24" class="tech-icon"><rect x="3" y="4" width="18" height="14" rx="1" stroke="currentColor" fill="none"/><path d="M2 20h20" stroke="currentColor" stroke-width="1.5"/></svg>`,
+            `<svg viewBox="0 0 24 24" class="tech-icon"><path d="M3 14v-2a9 9 0 0118 0v2" stroke="currentColor" fill="none"/><rect x="2" y="14" width="4" height="6" rx="1" fill="currentColor" opacity="0.7"/><rect x="18" y="14" width="4" height="6" rx="1" fill="currentColor" opacity="0.7"/></svg>`,
+            `<svg viewBox="0 0 24 24" class="tech-icon"><rect x="6" y="3" width="12" height="18" rx="6" stroke="currentColor" fill="none"/><path d="M12 3v6" stroke="currentColor"/></svg>`,
+            `<svg viewBox="0 0 24 24" class="tech-icon"><rect x="7" y="7" width="10" height="10" stroke="currentColor" fill="none"/><path d="M7 3v4M17 3v4M7 17v4M17 17v4M3 7h4M3 17h4M17 7h4M17 17h4" stroke="currentColor" stroke-width="0.8"/></svg>`,
+            `<svg viewBox="0 0 24 24" class="tech-icon"><path d="M2 12h20v6a2 2 0 01-2 2H4a2 2 0 01-2-2v-6z" stroke="currentColor" fill="none"/><circle cx="7" cy="16" r="1.5" fill="currentColor"/><circle cx="17" cy="16" r="1.5" fill="currentColor"/></svg>`,
+            `<svg viewBox="0 0 24 24" class="tech-icon"><rect x="4" y="6" width="16" height="12" rx="1" stroke="currentColor" fill="none"/><circle cx="12" cy="12" r="3" stroke="currentColor" fill="none"/></svg>`,
+            `<svg viewBox="0 0 24 24" class="tech-icon"><rect x="6" y="2" width="12" height="20" rx="2" stroke="currentColor" fill="none"/><circle cx="12" cy="18" r="1" fill="currentColor"/></svg>`,
+            `<svg viewBox="0 0 24 24" class="tech-icon"><rect x="5" y="8" width="14" height="10" rx="2" stroke="currentColor" fill="none"/><circle cx="12" cy="13" r="3" stroke="currentColor" fill="none"/><path d="M9 8V6a3 3 0 016 0v2" stroke="currentColor"/></svg>`,
+            `<svg viewBox="0 0 24 24" class="tech-icon"><circle cx="12" cy="12" r="2" stroke="currentColor" fill="none"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="currentColor" stroke-width="1.2"/></svg>`,
+            `<svg viewBox="0 0 24 24" class="tech-icon"><path d="M4 10v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2H6a2 2 0 00-2 2z" stroke="currentColor" fill="none"/><circle cx="9" cy="14" r="1.5" fill="currentColor" opacity="0.6"/><circle cx="15" cy="14" r="1.5" fill="currentColor" opacity="0.6"/></svg>`
+        ];
+
+        // Products with Images
+        const products = [
+            {
+                id: 1,
+                name: "COMMS-X7",
+                fullName: "COMMS-X7 Tactical Headset",
+                category: "audio",
+                price: 899.00,
+                image: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=400&auto=format&fit=crop&q=80",
+                description: "Military-grade noise cancellation"
+            },
+            {
+                id: 2,
+                name: "WATCH-OPS",
+                fullName: "WATCH-OPS Biometric",
+                category: "wearables",
+                price: 1249.00,
+                image: "https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=400&auto=format&fit=crop&q=80",
+                description: "Titanium chassis, GPS beacon"
+            },
+            {
+                id: 3,
+                name: "KEYBOARD-A",
+                fullName: "KEYBOARD-ASSAULT RGB",
+                category: "gaming",
+                price: 299.99,
+                image: "https://images.unsplash.com/photo-1595225476474-87563907a212?w=400&auto=format&fit=crop&q=80",
+                description: "Mechanical switches, per-key RGB"
+            },
+            {
+                id: 4,
+                name: "DRONE-S",
+                fullName: "DRONE-SURVEIL Mini",
+                category: "tech",
+                price: 1299.00,
+                image: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=400&auto=format&fit=crop&q=80",
+                description: "4K thermal, 10km range"
+            },
+            {
+                id: 5,
+                name: "BUDS-STEALTH",
+                fullName: "BUDS-STEALTH Pro",
+                category: "audio",
+                price: 349.00,
+                image: "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=400&auto=format&fit=crop&q=80",
+                description: "Covert design, bone conduction"
+            },
+            {
+                id: 6,
+                name: "CONSOLE-T",
+                fullName: "CONSOLE-TACTICAL Elite",
+                category: "gaming",
+                price: 699.99,
+                image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=400&auto=format&fit=crop&q=80",
+                description: "8K output, zero latency"
+            },
+            {
+                id: 7,
+                name: "CAM-TACTICAL",
+                fullName: "CAM-TACTICAL 360",
+                category: "tech",
+                price: 599.00,
+                image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&auto=format&fit=crop&q=80",
+                description: "360 coverage, night vision"
+            },
+            {
+                id: 8,
+                name: "MOUSE-ELITE",
+                fullName: "MOUSE-ELITE Sniper",
+                category: "gaming",
+                price: 149.99,
+                image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&auto=format&fit=crop&q=80",
+                description: "25K DPI, zero latency"
+            }
+        ];
+
+        let cart = [];
+        let currentCategory = 'all';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+            initCursor();
+            initTrail();
+            initFilters();
+            initSearch();
+        });
+
+        function initCursor() {
+            if (window.matchMedia('(pointer: coarse)').matches) return;
+            
+            const cursor = document.getElementById('cursor-main');
+            const center = document.getElementById('cursor-center');
+            let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
+            
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                center.style.left = mouseX + 'px';
+                center.style.top = mouseY + 'px';
+            });
+            
+            function animate() {
+                cursorX += (mouseX - cursorX) * 0.15;
+                cursorY += (mouseY - cursorY) * 0.15;
+                cursor.style.left = cursorX + 'px';
+                cursor.style.top = cursorY + 'px';
+                requestAnimationFrame(animate);
+            }
+            animate();
+            
+            const interactive = document.querySelectorAll('a, button, .brutal-card');
+            interactive.forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.style.transform = 'translate(-50%, -50%) rotate(45deg) scale(1.5)');
+                el.addEventListener('mouseleave', () => cursor.style.transform = 'translate(-50%, -50%) rotate(45deg) scale(1)');
+            });
+        }
+
+        function initTrail() {
+            if (window.matchMedia('(pointer: coarse)').matches) return;
+            
+            const container = document.getElementById('trail-container');
+            let lastX = 0, lastY = 0, distance = 0;
+            
+            document.addEventListener('mousemove', (e) => {
+                const dx = e.clientX - lastX;
+                const dy = e.clientY - lastY;
+                distance += Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance >= 60) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'tech-trail';
+                    wrapper.style.left = e.clientX + 'px';
+                    wrapper.style.top = e.clientY + 'px';
+                    wrapper.innerHTML = techIcons[Math.floor(Math.random() * techIcons.length)];
+                    wrapper.style.transform = `translate(-50%, -50%) scale(${0.5 + Math.random() * 0.5})`;
+                    
+                    container.appendChild(wrapper);
+                    
+                    gsap.to(wrapper, {
+                        y: e.clientY + 50 + Math.random() * 30,
+                        opacity: 0,
+                        scale: 0,
+                        duration: 1 + Math.random(),
+                        onComplete: () => wrapper.remove()
+                    });
+                    
+                    if (container.children.length > 20) container.removeChild(container.firstChild);
+                    distance = 0;
+                }
+                lastX = e.clientX;
+                lastY = e.clientY;
+            });
+        }
+
+        function renderProducts(searchTerm = '') {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = '';
+            
+            const filtered = products.filter(p => {
+                const matchesCategory = currentCategory === 'all' || p.category === currentCategory;
+                const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                    p.fullName.toLowerCase().includes(searchTerm.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+            
+            filtered.forEach((product) => {
+                const card = document.createElement('div');
+                card.className = 'brutal-card group';
+                card.innerHTML = `
+                    <div class="relative">
+                        <img src="${product.image}" alt="${product.name}" class="w-full h-32 md:h-40 object-cover filter contrast-125 saturate-50 group-hover:saturate-100 transition-all">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        <div class="absolute top-2 right-2 price-tag px-2 py-0.5 text-white text-[10px]">$${product.price}</div>
+                        <div class="absolute top-2 left-2 px-1.5 py-0.5 bg-black/60 border border-red-900/50 text-[8px] uppercase text-red-500 font-bold">${product.category}</div>
+                    </div>
+                    <div class="p-2 md:p-3">
+                        <h3 class="text-xs md:text-sm font-bold uppercase tracking-wider group-hover:text-red-500 transition-colors truncate">${product.name}</h3>
+                        <p class="text-[10px] text-gray-500 mt-1 truncate">${product.description}</p>
+                        <div class="flex items-center justify-between mt-2 pt-2 border-t border-red-900/20">
+                            <div class="flex items-center gap-1">
+                                <svg class="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <span class="text-[10px] text-gray-400">5.0</span>
+                            </div>
+                            <button onclick="addToCart(${product.id})" class="btn-brutal px-2 py-1 text-[10px]">Acquire</button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function initFilters() {
+            document.querySelectorAll('.kill-tab').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.kill-tab').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentCategory = btn.dataset.category;
+                    renderProducts(document.getElementById('search-input').value);
+                });
+            });
+        }
+
+        function initSearch() {
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                renderProducts(e.target.value);
+            });
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const existing = cart.find(item => item.id === productId);
+            
+            if (existing) existing.quantity++;
+            else cart.push({ ...product, quantity: 1 });
+            
+            updateCart();
+            showToast(product.name + ' secured');
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCart();
+        }
+
+        function updateQuantity(productId, change) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) removeFromCart(productId);
+                else updateCart();
+            }
+        }
+
+        function updateCart() {
+            const count = document.getElementById('cart-count');
+            const items = document.getElementById('cart-items');
+            const total = document.getElementById('cart-total');
+            
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            count.textContent = totalItems;
+            count.classList.toggle('hidden', totalItems === 0);
+            
+            if (cart.length === 0) {
+                items.innerHTML = '<div class="text-center text-gray-600 mt-10"><p class="text-xs uppercase tracking-widest">Armory Empty</p></div>';
+            } else {
+                items.innerHTML = cart.map(item => `
+                    <div class="brutal-card p-2 mb-2 flex gap-2">
+                        <img src="${item.image}" class="w-12 h-12 object-cover">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-xs font-bold uppercase truncate">${item.name}</h4>
+                            <div class="text-red-600 text-xs font-bold">$${item.price}</div>
+                            <div class="flex items-center gap-2 mt-1">
+                                <button onclick="updateQuantity(${item.id}, -1)" class="w-5 h-5 bg-red-900/20 flex items-center justify-center text-xs">-</button>
+                                <span class="text-xs w-4 text-center">${item.quantity}</span>
+                                <button onclick="updateQuantity(${item.id}, 1)" class="w-5 h-5 bg-red-900/20 flex items-center justify-center text-xs">+</button>
+                            </div>
+                        </div>
+                        <button onclick="removeFromCart(${item.id})" class="text-red-900 hover:text-red-600 self-start">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                `).join('');
+            }
+            
+            total.textContent = '$' + totalPrice.toFixed(2);
+        }
+
+        function toggleCart() {
+            const overlay = document.getElementById('cart-overlay');
+            const sidebar = document.getElementById('cart-sidebar');
+            const backdrop = overlay.querySelector('div:first-child');
+            
+            if (sidebar.classList.contains('translate-x-full')) {
+                overlay.classList.remove('pointer-events-none');
+                backdrop.classList.remove('opacity-0');
+                sidebar.classList.remove('translate-x-full');
+            } else {
+                overlay.classList.add('pointer-events-none');
+                backdrop.classList.add('opacity-0');
+                sidebar.classList.add('translate-x-full');
+            }
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('translate-x-full');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            toast.style.transform = 'translateX(0)';
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.transform = 'translateX(300px)';
+                toast.style.opacity = '0';
+            }, 2000);
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                showToast('Armory empty');
+                return;
+            }
+            showToast('Processing...');
+            setTimeout(() => toggleCart(), 1000);
+        }
+
+        function scrollToArsenal() {
+            document.getElementById('arsenal').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function loadMore() {
+            showToast('Loading assets...');
+        }
+    </script>
+</body>
+</html>
